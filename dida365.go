@@ -10,8 +10,7 @@ import (
 	"github.com/ziyixi/go-ticktick"
 )
 
-func CreateDidaTask(p *parsedPost) (*ticktick.TaskItem, error) {
-	// create client
+func LoginDidaClient() (*ticktick.Client, error) {
 	err := godotenv.Load()
 	if err != nil {
 		return nil, fmt.Errorf("no .env file found")
@@ -20,7 +19,10 @@ func CreateDidaTask(p *parsedPost) (*ticktick.TaskItem, error) {
 	if err != nil {
 		return nil, err
 	}
+	return c, nil
+}
 
+func CreateDidaTask(c *ticktick.Client, p *parsedPost) (*ticktick.TaskItem, error) {
 	// task content
 	template := "**From: %v** \n**Date: %v** \n**Received: %v** \n**Subject: %v** \n\n" + strings.Repeat("=", 20) + "\n%v"
 	content := fmt.Sprintf(template, p.From, p.Date, p.To, p.Subject, p.Content)
@@ -28,7 +30,7 @@ func CreateDidaTask(p *parsedPost) (*ticktick.TaskItem, error) {
 
 	// create task
 	task, err := ticktick.NewTask(c, title, content, time.Time{}, "")
-	task.Tags = append(task.Tags, "email", p.To)
+	task.Tags = append(task.Tags, "email")
 	if err != nil {
 		return nil, err
 	}

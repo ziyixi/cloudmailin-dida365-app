@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
+	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
+	"github.com/ziyixi/go-ticktick"
 )
 
 type parsedPost struct {
@@ -34,10 +37,45 @@ func parseJson(s string) *parsedPost {
 		Subject: gjson.Get(s, "headers.subject").String(),
 		Content: markdown,
 	}
+
+	// outlook may have a prefix FW:
+	heloDomain := gjson.Get(s, "envelope.helo_domain").String()
+	if strings.Contains(heloDomain, "outlook") && strings.HasPrefix(res.Subject, "FW: ") {
+		res.Subject = res.Subject[4:]
+	}
+
+	// outlook might foward the email in the forwarding format
+	if strings.Contains(res.To, "cloudmailin") {
+		// parse the correct To
+		re, _ := regexp.Compile(`_+\\r\\nFrom: .*?([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)`)
+		matches := re.FindStringSubmatch(s)
+		if len(matches) < 2 {
+			res.To = res.From
+			res.From = "sender unknown"
+		} else {
+			res.To = res.From
+			res.From = matches[1]
+		}
+	}
+
 	return &res
 }
 
 func HandleCMIPost(c *gin.Context) {
+	// check context
+	var client *ticktick.Client
+	if clientraw, ok := c.Get("client"); !ok {
+		newclient, err := LoginDidaClient()
+		if err != nil {
+			panic(err)
+		}
+		client = newclient
+		c.Set("client", newclient)
+	} else {
+		client = clientraw.(*ticktick.Client)
+	}
+
+	// handle request
 	dataRaw, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		return
@@ -48,7 +86,7 @@ func HandleCMIPost(c *gin.Context) {
 		return
 	}
 
-	task, err := CreateDidaTask(parsedRes)
+	task, err := CreateDidaTask(client, parsedRes)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprint(err)})
 		return
