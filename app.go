@@ -10,7 +10,7 @@ import (
 func testEnv() {
 	_, err := LoginDidaClient()
 	if err != nil {
-		panic("Couldn't login in dida365. Check .env file")
+		panic(err)
 	}
 }
 
@@ -18,10 +18,7 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	// basic auth
-	err := godotenv.Load()
-	if err != nil {
-		panic("Couldn't load .env")
-	}
+	godotenv.Load() // it's OK if no .env, as we read from ENV variables instead
 	cmiUser := os.Getenv("cloudmailin_username")
 	cmiPass := os.Getenv("cloudmailin_password")
 	if len(cmiUser) == 0 || len(cmiPass) == 0 {
@@ -41,5 +38,5 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	r := setupRouter()
-	r.Run(":8080")
+	r.Run(":" + os.Getenv("PORT"))
 }

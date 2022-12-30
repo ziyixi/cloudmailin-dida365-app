@@ -11,11 +11,14 @@ import (
 )
 
 func LoginDidaClient() (*ticktick.Client, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("no .env file found")
+	godotenv.Load()
+	username := os.Getenv("username")
+	password := os.Getenv("password")
+	if username == "" || password == "" {
+		return nil, fmt.Errorf("no username or password found")
 	}
-	c, err := ticktick.NewClient(os.Getenv("username"), os.Getenv("password"), "dida365")
+
+	c, err := ticktick.NewClient(username, password, "dida365")
 	if err != nil {
 		return nil, err
 	}
