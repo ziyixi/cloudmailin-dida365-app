@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"net/http"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/gin-gonic/gin"
@@ -9,7 +11,8 @@ import (
 )
 
 type parsedPost struct {
-	From    string // envelope.from
+	From    string // headers.from
+	To      string // headers.to
 	Date    string // headers.date
 	Subject string // headers.subject
 	Content string // md(html)
@@ -25,7 +28,8 @@ func parseJson(s string) *parsedPost {
 	}
 
 	res := parsedPost{
-		From:    gjson.Get(s, "envelope.from").String(),
+		From:    gjson.Get(s, "headers.from").String(),
+		To:      gjson.Get(s, "headers.to").String(),
 		Date:    gjson.Get(s, "headers.date").String(),
 		Subject: gjson.Get(s, "headers.subject").String(),
 		Content: markdown,
@@ -44,5 +48,10 @@ func HandleCMIPost(c *gin.Context) {
 		return
 	}
 
-	CreateDidaTask(parsedRes)
+	task, err := CreateDidaTask(parsedRes)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprint(err)})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"task_id": task.Id})
 }
