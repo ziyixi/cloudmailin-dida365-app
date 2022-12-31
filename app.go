@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -28,10 +27,6 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	gin.SetMode(gin.ReleaseMode)
-
-	for _, pair := range os.Environ() {
-		fmt.Println(pair)
-	}
 
 	listenAddr := ":" + os.Getenv("PORT")
 	if val, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT"); ok {
