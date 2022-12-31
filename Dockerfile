@@ -16,7 +16,7 @@ RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/app
 # STEP 2 build a small image
 ############################
 FROM scratch
-
+LABEL org.opencontainers.image.source=https://github.com/ziyixi/cloudmailin-dida365-app
 ENV PORT=8080
 # Copy our static executable.
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
