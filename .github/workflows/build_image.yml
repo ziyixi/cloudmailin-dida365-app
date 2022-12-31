@@ -18,6 +18,5 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        docker build . --tag ghcr.io/ziyixi/cloudmailin-dida365-app:latest
-        docker run ghcr.io/ziyixi/cloudmailin-dida365-app:latest
+        docker build -t ghcr.io/ziyixi/cloudmailin-dida365-app:latest .
         docker push ghcr.io/ziyixi/cloudmailin-dida365-app:latest
