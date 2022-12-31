@@ -20,14 +20,18 @@ func setupRouter() *gin.Engine {
 		cmiUser: cmiPass,
 	}))
 
-	authorized.POST("/", HandleCMIPost)
+	authorized.POST("/api/CloudmailinDida365App", HandleCMIPost)
 
 	return r
 }
 
 func main() {
 	gin.SetMode(gin.ReleaseMode)
+	listenAddr := ":" + os.Getenv("PORT")
+	if val, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT"); ok {
+		listenAddr = ":" + val
+	}
 
 	r := setupRouter()
-	r.Run(":" + os.Getenv("PORT"))
+	r.Run(listenAddr)
 }
