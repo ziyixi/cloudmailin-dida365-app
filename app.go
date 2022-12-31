@@ -7,16 +7,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func testEnv() {
-	_, err := LoginDidaClient()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func setupRouter() *gin.Engine {
 	r := gin.Default()
-
 	// basic auth
 	godotenv.Load() // it's OK if no .env, as we read from ENV variables instead
 	cmiUser := os.Getenv("cloudmailin_username")
@@ -34,7 +26,6 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	testEnv()
 	gin.SetMode(gin.ReleaseMode)
 
 	r := setupRouter()

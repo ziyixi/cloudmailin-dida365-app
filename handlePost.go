@@ -10,7 +10,6 @@ import (
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
-	"github.com/ziyixi/go-ticktick"
 )
 
 type parsedPost struct {
@@ -62,17 +61,9 @@ func parseJson(s string) *parsedPost {
 }
 
 func HandleCMIPost(c *gin.Context) {
-	// check context
-	var client *ticktick.Client
-	if clientraw, ok := c.Get("client"); !ok {
-		newclient, err := LoginDidaClient()
-		if err != nil {
-			panic(err)
-		}
-		client = newclient
-		c.Set("client", newclient)
-	} else {
-		client = clientraw.(*ticktick.Client)
+	client, err := LoginDidaClient()
+	if err != nil {
+		panic(err)
 	}
 
 	// handle request
