@@ -11,7 +11,7 @@ COPY . .
 # Using go get.
 RUN go get -d -v
 # Build the binary.
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/app
+RUN CGO_ENABLED=0 go install -ldflags '-extldflags "-static"'
 ############################
 # STEP 2 build a small image
 ############################
@@ -20,7 +20,7 @@ LABEL org.opencontainers.image.source=https://github.com/ziyixi/cloudmailin-dida
 ENV PORT=8080
 # Copy our static executable.
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /go/bin/app /go/bin/app
+COPY --from=builder /go/bin/cloudmailin-dida365-app /cloudmailin-dida365-app
 # Run the app binary.
 EXPOSE 8080
-ENTRYPOINT ["/go/bin/app"]
+ENTRYPOINT ["/cloudmailin-dida365-app"]
