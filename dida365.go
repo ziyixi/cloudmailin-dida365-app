@@ -12,8 +12,8 @@ import (
 
 func LoginDidaClient() (*ticktick.Client, error) {
 	godotenv.Load()
-	username := os.Getenv("username")
-	password := os.Getenv("password")
+	username := os.Getenv("dida365_username")
+	password := os.Getenv("dida365_password")
 	if username == "" || password == "" {
 		return nil, fmt.Errorf("no username or password found")
 	}
