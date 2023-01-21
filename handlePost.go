@@ -23,6 +23,10 @@ type parsedPost struct {
 func parseJson(s string) *parsedPost {
 	converter := md.NewConverter("", true, nil)
 	html := gjson.Get(s, "html").String()
+	// html might have string start with #, replace them
+	m1 := regexp.MustCompile(`#(\S+) `)
+	html = m1.ReplaceAllString(html, "~${1} ")
+
 	markdown, err := converter.ConvertString(html)
 	if err != nil || len(markdown) == 0 {
 		// use plain text instead
