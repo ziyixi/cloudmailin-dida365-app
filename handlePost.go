@@ -27,11 +27,16 @@ func parseJson(s string) *parsedPost {
 	m1 := regexp.MustCompile(`#(\S+) `)
 	html = m1.ReplaceAllString(html, "~${1} ")
 
-	markdown, err := converter.ConvertString(html)
-	if err != nil || len(markdown) == 0 {
+	markdownRaw, err := converter.ConvertString(html)
+	if err != nil || len(markdownRaw) == 0 {
 		// use plain text instead
-		markdown = gjson.Get(s, "plain").String()
+		markdownRaw = gjson.Get(s, "plain").String()
 	}
+
+	// remove all urls
+	urlPattern := `\(\s*https[^()]*\)`
+	m2 := regexp.MustCompile(urlPattern)
+	markdown := m2.ReplaceAllString(markdownRaw, "()")
 
 	res := parsedPost{
 		From:    gjson.Get(s, "headers.from").String(),
