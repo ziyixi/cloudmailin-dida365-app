@@ -17,7 +17,7 @@ func summaryByChatGPT(content string) string {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role: openai.ChatMessageRoleUser,
-					Content: `Summary the following email as markdown bullet points concisely.			
+					Content: `Summarize the following email in a way that highlights the main idea using bullet points in Markdown format so I can easily recall it later, it can use sub-bullet points to be more organized, and it shouldn't include level 1 Headings:			
 
 					` + content,
 				},
